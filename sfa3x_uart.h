@@ -46,7 +46,8 @@ extern "C" {
 #include "sensirion_config.h"
 
 /**
- * sfa3x_start_continuous_measurement() - Default output format 0.
+ * sfa3x_start_continuous_measurement() - Starts continuous measurement in
+ * polling mode.
  *
  * @note This command is only available in idle mode.
  *
@@ -55,7 +56,7 @@ extern "C" {
 int16_t sfa3x_start_continuous_measurement(void);
 
 /**
- * sfa3x_stop_measurement() - Leaves the measurement mode and returns to idle
+ * sfa3x_stop_measurement() - Stops the measurement mode and returns to idle
  * mode.
  *
  * @note This command is only available in measurement mode.
@@ -65,29 +66,41 @@ int16_t sfa3x_start_continuous_measurement(void);
 int16_t sfa3x_stop_measurement(void);
 
 /**
- * sfa3x_read_measured_values_output_format_2() - Read measured values integer.
+ * sfa3x_read_measured_values_ticks() - Returns the new measurement results as
+ * integers.
  *
- * @param hcho Formaldehyde concentration in ppb as a 16-bit signed integer.
- * Positive values only, negative values are coerced to zero. Scale factor 5
- * ppb^(-1).
+ * @param hcho Formaldehyde concentration in ppb with a scaling of 5.
  *
- * @param relative_humidity Relative humidity in %. Values between 0 and 100
- * only. With internal correction for temperature offset (if configured). Scale
- * factor 100 %^(-1).
+ * @param humidity Relative humidity in % RH with a scaling of 100.
  *
- * @param temperature Temperature in °C. With internal correction for
- * temperature offset (if configured). Scale factor 200 °C^(-1).
+ * @param temperature Temperature in degrees Celsius with a scaling of 200.
  *
  * @return 0 on success, an error code otherwise
  */
-int16_t sfa3x_read_measured_values_output_format_2(int16_t* hcho,
-                                                   int16_t* relative_humidity,
-                                                   int16_t* temperature);
+int16_t sfa3x_read_measured_values_ticks(int16_t* hcho,
+                                         int16_t* relative_humidity,
+                                         int16_t* temperature);
 
 /**
- * sfa3x_get_device_marking() - Gets the device marking from the device.
+ * sfa3x_read_measured_values() - Returns the new measurement results as
+ * float.
  *
- * @param device_marking String containing the device marking.
+ * @param hcho Formaldehyde concentration in ppb.
+ *
+ * @param humidity Relative humidity in % RH.
+ *
+ * @param temperature Temperature in degrees Celsius.
+ *
+ * @return 0 on success, an error code otherwise
+ */
+int16_t sfa3x_read_measured_values(float* hcho, float* humidity,
+                                   float* temperature);
+
+/**
+ * sfa3x_get_device_marking() - Read the device marking string from the device.
+ *
+ * @param device_marking ASCII string containing the serial number. The string
+ * has the null-termination character included and is at most 32 bytes long.
  *
  * @return 0 on success, an error code otherwise
  */
