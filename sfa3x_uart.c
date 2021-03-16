@@ -60,10 +60,7 @@ int16_t sfa3x_start_continuous_measurement(void) {
     sensirion_uart_hal_sleep_usec(10000);
 
     error = sensirion_shdlc_rx_inplace(&frame, 0, &header);
-    if (error) {
-        return error;
-    }
-    return NO_ERROR;
+    return error;
 }
 
 int16_t sfa3x_stop_measurement(void) {
@@ -82,10 +79,7 @@ int16_t sfa3x_stop_measurement(void) {
     sensirion_uart_hal_sleep_usec(10000);
 
     error = sensirion_shdlc_rx_inplace(&frame, 0, &header);
-    if (error) {
-        return error;
-    }
-    return NO_ERROR;
+    return error;
 }
 
 int16_t sfa3x_read_measured_values_ticks(int16_t* hcho,
@@ -139,7 +133,7 @@ int16_t sfa3x_read_measured_values(float* hcho, float* humidity,
 int16_t sfa3x_get_device_marking(unsigned char* device_marking,
                                  uint8_t device_marking_size) {
     struct sensirion_shdlc_rx_header header;
-    uint8_t buffer[522];
+    uint8_t buffer[76];
     struct sensirion_shdlc_buffer frame;
     sensirion_shdlc_begin_frame(&frame, &buffer[0], 0xD0, SFA3X_UART_ADDRESS,
                                 1);
@@ -153,7 +147,7 @@ int16_t sfa3x_get_device_marking(unsigned char* device_marking,
 
     sensirion_uart_hal_sleep_usec(10000);
 
-    error = sensirion_shdlc_rx_inplace(&frame, 255, &header);
+    error = sensirion_shdlc_rx_inplace(&frame, 32, &header);
     if (error) {
         return error;
     }
@@ -175,7 +169,7 @@ int16_t sfa3x_device_reset(void) {
         return error;
     }
 
-    sensirion_uart_hal_sleep_usec(200000);
+    sensirion_uart_hal_sleep_usec(10000);
 
     error = sensirion_shdlc_rx_inplace(&frame, 0, &header);
     if (error) {
