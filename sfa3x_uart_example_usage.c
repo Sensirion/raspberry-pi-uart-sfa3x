@@ -1,9 +1,4 @@
 /*
- * SHDLC-Generator: 0.8.2
- * Yaml Version: 0.1.0
- * Template Version: 0.7.0
- */
-/*
  * Copyright (c) 2021, Sensirion AG
  * All rights reserved.
  *
@@ -40,12 +35,11 @@
 #include "sensirion_uart_hal.h"
 #include "sfa3x_uart.h"
 
-/**
- * TO USE CONSOLE OUTPUT (PRINTF) AND PLATFORM
+/*
+ * TO USE CONSOLE OUTPUT (PRINTF) YOU MAY NEED TO ADAPT THE INCLUDE ABOVE OR
+ * DEFINE IT ACCORDING TO YOUR PLATFORM:
+ * #define printf(...)
  */
-//#define printf(...)
-
-// TODO: DRIVER_GENERATOR Add missing commands and make prints more pretty
 
 int main(void) {
     int16_t error = 0;
@@ -56,10 +50,23 @@ int main(void) {
         return error;
     }
 
+    error = sfa3x_device_reset();
+    if (error) {
+        printf("Error resetting device: %i\n", error);
+        return -1;
+    }
+
+    uint8_t device_marking[32];
+    error =
+        sfa3x_get_device_marking(&device_marking[0], sizeof(device_marking));
+    if (error) {
+        printf("Error getting device marking: %i\n", error);
+        return -1;
+    }
+    printf("Device marking: %s\n", device_marking);
+
     // Start Measurement
-
     error = sfa3x_start_continuous_measurement();
-
     if (error) {
         printf("Error executing sfa3x_start_continuous_measurement(): %i\n",
                error);
@@ -67,14 +74,25 @@ int main(void) {
 
     for (;;) {
         // Read Measurement
-        // TODO: DRIVER_GENERATOR check and update measurement interval
-        sensirion_uart_hal_sleep_usec(1000000);
-        // TODO: DRIVER_GENERATOR Add scale and offset to printed measurement
-        // values
+
+        float hcho;
+        float humidity;
+        float temperature;
+
+        sensirion_uart_hal_sleep_usec(500000);
+
+        error = sfa3x_read_measured_values(&hcho, &humidity, &temperature);
+
+        if (error) {
+            printf("Error executing sfa3x_read_measured_values(): %i\n", error);
+        } else {
+            printf("Formaldehyde concentration: %.1f ppb\n", hcho);
+            printf("Relative humidity: %.2f %%RH\n", humidity);
+            printf("Temperature: %.2f °C\n", temperature);
+        }
     }
 
     error = sfa3x_stop_measurement();
-
     if (error) {
         printf("Error executing sfa3x_stop_measurement(): %i\n", error);
     }
